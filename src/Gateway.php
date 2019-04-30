@@ -1,24 +1,13 @@
 <?php
 /**
- * PaymentWall Gateway
+ * PaymentWall Gateway.
  */
-
 namespace Omnipay\PaymentWall;
 
 use Omnipay\Common\AbstractGateway;
 
-if (!class_exists('Paymentwall_Instance')) {
-    // Pull in paymentwall library which has no namespacing.
-    $dirname = __FILE__;
-    do {
-        $dirname = dirname($dirname);
-        $filename = $dirname . '/vendor/paymentwall/paymentwall-php/lib/paymentwall.php';
-    } while (! file_exists($filename));
-    require_once $filename;
-}
-
 /**
- * PaymentWall Gateway
+ * PaymentWall Gateway.
  *
  * Paymentwall is the leading digital payments platform for globally monetizing
  * digital goods and services. Paymentwall assists game publishers, dating publics,
@@ -28,10 +17,7 @@ if (!class_exists('Paymentwall_Instance')) {
  * This uses the PaymentWall library at https://github.com/paymentwall/paymentwall-php
  * and the Brick API to communicate to PaymentWall.
  *
- * Add this to your app bootstrap file to pull in the library
- * require_once __DIR__ . '/path/to/vendor/paymentwall/paymentwall-php/lib/paymentwall.php';
- *
- * <h4>Example</h4>
+ * ### Example
  *
  * <code>
  *   // Create a gateway for the PaymentWall REST Gateway
@@ -78,15 +64,86 @@ if (!class_exists('Paymentwall_Instance')) {
  *   }
  * </code>
  *
- * <h4>Quirks</h4>
+ * ### Quirks
  *
  * * There is no separate createCard message in this gateway.  The
  *   PaymentWall gateway only supports card creation at the time of a
  *   purchase.  Instead, a cardReference is returned when a purchase
  *   message is sent, as a component of the response to the purchase
  *   message.  This card token can then be used to make purchases
- *   in place of card data, just like other gateways.
- * * Refunds are not supported, these must be done manually.
+ *   in place of card data, just like other gateways.  An authorize()
+ *   request can also be used to create a payment token, for the amount
+ *   of $0.00 USD *except* for American Express cards where an authorize
+ *   amount of $0.10 USD must be used.
+ * * Refunds are not supported, these must be done manually.  Voids
+ *   are supported.  The refund() call within the API in fact does a
+ *   void.
+ * * During notify callbacks (referred to as "pingbacks" by PaymentWall)
+ *   the transaction amount will frequently be reported in USD regardless
+ *   of the currency of the original purchase.
+ * * An error code of 3201 while attempting a void() call should be treated
+ *   as a success. This error code indicates that the payment has already
+ *   been cancelled manually at the gateway by PaymentWall staff and so
+ *   this error code actually is just communicating "payment cannot be voided,
+ *   already voided".
+ * * Many functions of the gateway that work in production mode either do
+ *   not work in test mode or work differently in test mode.  Be prepared
+ *   to do some testing in production mode.
+ *
+ * ### Full parameter Set
+ *
+ * This includes all optional parameters including those that are used
+ * for fraud detection/prevention.
+ *
+ * <code>
+ *   charge => [
+ *       uid
+ *       plan
+ *       amount
+ *       currency
+ *       fingerprint
+ *       description
+ *       browser_ip
+ *       browser_domain
+ *       customer => [
+ *           sex
+ *           firstname
+ *           lastname
+ *           username
+ *           zip
+ *           birthday
+ *       ]
+ *       history = > [
+ *           membership
+ *           membership_date
+ *           registration_date
+ *           registration_country
+ *           registration_ip
+ *           registration_email
+ *           registration_email_verified
+ *           registration_name
+ *           registration_lastname
+ *           registration_source
+ *           logins_number
+ *           payments_number
+ *           payments_amount
+ *           followers
+ *           messages_sent
+ *           messages_sent_last_24hours
+ *           messages_received
+ *           interactions
+ *           interactions_last_24hours
+ *           risk_score
+ *           was_banned
+ *           delivered_products
+ *           cancelled_payments
+ *           registration_age
+ *       ]
+ *       3dsecure
+ *       options => []
+ *       custom => []
+ *   ]
+ * </code>
  *
  * @see \Omnipay\Common\AbstractGateway
  * @see \Omnipay\PaymentWall\Message\AbstractRestRequest
@@ -96,13 +153,12 @@ if (!class_exists('Paymentwall_Instance')) {
  */
 class Gateway extends AbstractGateway
 {
-
-	const API_VC	= \Paymentwall_Config::API_VC;
-	const API_GOODS	= \Paymentwall_Config::API_GOODS;
-	const API_CART	= \Paymentwall_Config::API_CART;
+    const API_VC = \Paymentwall_Config::API_VC;
+    const API_GOODS = \Paymentwall_Config::API_GOODS;
+    const API_CART = \Paymentwall_Config::API_CART;
 
     /**
-     * Get the gateway display name
+     * Get the gateway display name.
      *
      * @return string
      */
@@ -112,7 +168,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Get the gateway default parameters
+     * Get the gateway default parameters.
      *
      * @return array
      */
@@ -126,7 +182,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Get the gateway apiType -- used in every request
+     * Get the gateway apiType -- used in every request.
      *
      * @return string
      */
@@ -136,7 +192,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Set the gateway apiType -- used in every request
+     * Set the gateway apiType -- used in every request.
      *
      * @return Gateway provides a fluent interface.
      */
@@ -146,7 +202,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Get the gateway publicKey -- used in every request
+     * Get the gateway publicKey -- used in every request.
      *
      * @return string
      */
@@ -156,7 +212,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Set the gateway publicKey -- used in every request
+     * Set the gateway publicKey -- used in every request.
      *
      * @return Gateway provides a fluent interface.
      */
@@ -166,7 +222,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Get the gateway privateKey -- used in every request
+     * Get the gateway privateKey -- used in every request.
      *
      * @return string
      */
@@ -176,7 +232,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Set the gateway privateKey -- used in every request
+     * Set the gateway privateKey -- used in every request.
      *
      * @return Gateway provides a fluent interface.
      */
@@ -193,6 +249,7 @@ class Gateway extends AbstractGateway
      * Create a purchase request.
      *
      * @param array $parameters
+     *
      * @return \Omnipay\PaymentWall\Message\PurchaseRequest
      */
     public function purchase(array $parameters = array())
@@ -201,13 +258,62 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     * Create an authorize request.
+     *
+     * @param array $parameters
+     *
+     * @return \Omnipay\PaymentWall\Message\AuthorizeRequest
+     */
+    public function authorize(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\PaymentWall\Message\AuthorizeRequest', $parameters);
+    }
+
+    /**
+     * Create a capture request.
+     *
+     * @param array $parameters
+     *
+     * @return \Omnipay\PaymentWall\Message\CaptureRequest
+     */
+    public function capture(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\PaymentWall\Message\CaptureRequest', $parameters);
+    }
+
+    /**
      * Create a void request.
      *
      * @param array $parameters
+     *
      * @return \Omnipay\PaymentWall\Message\VoidRequest
      */
     public function void(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PaymentWall\Message\VoidRequest', $parameters);
+    }
+
+    /**
+     * Create a refund request.
+     *
+     * @param array $parameters
+     *
+     * @return \Omnipay\PaymentWall\Message\RefundRequest
+     */
+    public function refund(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\PaymentWall\Message\RefundRequest', $parameters);
+    }
+
+    /**
+     * Create a purchase status request.
+     *
+     * @param array $parameters
+     *
+     * @return \Omnipay\PaymentWall\Message\PurchaseStatusRequest
+     */
+    public function getPurchaseStatus(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\PaymentWall\Message\PurchaseStatusRequest', $parameters);
     }
 }

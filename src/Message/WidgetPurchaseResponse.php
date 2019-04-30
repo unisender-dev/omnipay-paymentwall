@@ -1,30 +1,36 @@
 <?php
 /**
- * PaymentWall Library Response.
+ * PaymentWall Widget Purchase Response.
+ *
+ * Class WidgetPurchaseResponse
+ *
+ * @author Satheesh Narayanan <satheesh@incube8.sg>
  */
 namespace Omnipay\PaymentWall\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
+use Omnipay\Common\Message\RedirectResponseInterface;
 use Omnipay\Common\Message\RequestInterface;
 
 /**
- * PaymentWall Library Response.
+ * PaymentWall Widget Purchase Response.
  *
- * This is the response class for all PaymentWall Library requests.
+ * This is the response class for all PaymentWall Widget Purchase requests.
  *
  * @link https://www.paymentwall.com/en/documentation/getting-started
- * @see \Omnipay\PaymentWall\Gateway
+ * @see \Omnipay\PaymentWall\WidgetGateway
  */
-class Response extends AbstractResponse
+class WidgetPurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
     protected $statusCode;
 
-    /** @var bool */
-    protected $captured = false;
-
-    /** @var bool */
-    protected $underReview = false;
-
+    /**
+     * WidgetPurchaseResponse constructor.
+     *
+     * @param RequestInterface $request
+     * @param mixed            $data
+     * @param int              $statusCode
+     */
     public function __construct(RequestInterface $request, $data, $statusCode = 200)
     {
         parent::__construct($request, $data);
@@ -32,53 +38,30 @@ class Response extends AbstractResponse
     }
 
     /**
-     * Set captured status.
-     *
-     * @param bool $captured
-     *
-     * @return Response provides a fluent interface
-     */
-    public function setCaptured($captured)
-    {
-        $this->captured = $captured;
-
-        return $this;
-    }
-
-    /**
-     * Get captured status.
+     * Declare the response is Redirect Method.
      *
      * @return bool
      */
-    public function isCaptured()
+    public function isRedirect()
     {
-        return $this->captured;
+        return true;
     }
 
     /**
-     * Set under review status.
+     * Fetch the Redirect URL from response data.
      *
-     * @param bool $underReview
-     *
-     * @return Response provides a fluent interface
+     * @return mixed
      */
-    public function setUnderReview($underReview)
+    public function getRedirectUrl()
     {
-        $this->underReview = $underReview;
-
-        return $this;
+        return $this->data;
     }
 
     /**
-     * Get under review status.
+     * Return the response status.
      *
      * @return bool
      */
-    public function isUnderReview()
-    {
-        return $this->underReview;
-    }
-
     public function isSuccessful()
     {
         // The PaymentWall gateway returns errors in several possible different ways.
@@ -102,7 +85,7 @@ class Response extends AbstractResponse
     /**
      * Get Transaction Reference.
      *
-     * @return string
+     * @return string|null
      */
     public function getTransactionReference()
     {
@@ -115,7 +98,7 @@ class Response extends AbstractResponse
     /**
      * Get Card Reference.
      *
-     * @return string
+     * @return string|null
      */
     public function getCardReference()
     {
@@ -124,6 +107,11 @@ class Response extends AbstractResponse
         }
     }
 
+    /**
+     * Fetch error Message if any.
+     *
+     * @return string|null
+     */
     public function getMessage()
     {
         if (isset($this->data['error'])) {
@@ -131,6 +119,11 @@ class Response extends AbstractResponse
         }
     }
 
+    /**
+     * Fetch code from response.
+     *
+     * @return string|null
+     */
     public function getCode()
     {
         if (isset($this->data['error']) && is_array($this->data['error']) && isset($this->data['error']['code'])) {
@@ -139,5 +132,23 @@ class Response extends AbstractResponse
         if (isset($this->data['code'])) {
             return $this->data['code'];
         }
+    }
+
+    /**
+     * Get redirect method.
+     *
+     * @return null
+     */
+    public function getRedirectMethod()
+    {
+    }
+
+    /**
+     * Fetch redirect data.
+     *
+     * @return null
+     */
+    public function getRedirectData()
+    {
     }
 }

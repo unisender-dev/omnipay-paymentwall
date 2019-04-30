@@ -1,16 +1,13 @@
 <?php
 /**
- * PaymentWall Abstract Library Request
+ * PaymentWall Abstract Library Request.
  */
-
 namespace Omnipay\PaymentWall\Message;
 
 // use Guzzle\Http\EntityBody;
 
 /**
- * PaymentWall Abstract Library Request
- *
- * FIXME: This is not finished yet.
+ * PaymentWall Abstract Library Request.
  *
  * This is the parent class for all PaymentWall Library requests.
  *
@@ -24,7 +21,24 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
     const API_VERSION = '1';
 
     /**
-     * Get the gateway apiType -- used in every request
+     * Get the Paymentwall API end point.
+     *
+     * @var string
+     */
+    protected $endPoint = 'https://api.paymentwall.com/api';
+
+    /**
+     * Fetch EndPoint for Paymentwall Api.
+     *
+     * @return string
+     */
+    protected function getEndpoint()
+    {
+        return $this->endPoint;
+    }
+
+    /**
+     * Get the gateway apiType -- used in every request.
      *
      * @return string
      */
@@ -34,7 +48,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
     }
 
     /**
-     * Set the gateway apiType -- used in every request
+     * Set the gateway apiType -- used in every request.
      *
      * @return Gateway provides a fluent interface.
      */
@@ -44,7 +58,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
     }
 
     /**
-     * Get the gateway publicKey -- used in every request
+     * Get the gateway publicKey -- used in every request.
      *
      * @return string
      */
@@ -54,7 +68,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
     }
 
     /**
-     * Set the gateway publicKey -- used in every request
+     * Set the gateway publicKey -- used in every request.
      *
      * @return Gateway provides a fluent interface.
      */
@@ -64,7 +78,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
     }
 
     /**
-     * Get the gateway privateKey -- used in every request
+     * Get the gateway privateKey -- used in every request.
      *
      * @return string
      */
@@ -74,7 +88,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
     }
 
     /**
-     * Set the gateway privateKey -- used in every request
+     * Set the gateway privateKey -- used in every request.
      *
      * @return Gateway provides a fluent interface.
      */
@@ -98,6 +112,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
         $data = array(
             'public_key'        => $this->getPublicKey(),
         );
+
         return $data;
     }
 
@@ -126,6 +141,7 @@ abstract class AbstractLibraryRequest extends \Omnipay\Common\Message\AbstractRe
         if (\Paymentwall_Config::getInstance()->getPublicKey() == false) {
             $this->setPaymentWallObject();
         }
+
         return \Paymentwall_Config::getInstance();
     }
 }
