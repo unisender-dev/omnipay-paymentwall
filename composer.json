@@ -12,6 +12,7 @@
     ],
     "homepage": "https://github.com/twostars/omnipay-paymentwall",
     "license": "MIT",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Del",
