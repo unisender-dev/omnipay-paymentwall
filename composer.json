@@ -10,22 +10,13 @@
         "pay",
         "payment"
     ],
-    "homepage": "https://github.com/twostars/omnipay-paymentwall",
-    "license": "MIT",
-    "minimum-stability": "stable",
-    "authors": [
-        {
-            "name": "Del",
-            "email": "del@incube8.sg"
-        }
-    ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=7.0",
         "paymentwall/paymentwall-php": "dev-master",
-        "omnipay/common": "~2.0"
+        "omnipay/common": "^2"
     },
     "require-dev": {
-        "omnipay/tests": "~2.0",
+        "omnipay/tests": "^2",
         "omnipay/dummy": "dev-master"
     },
     "autoload": {
@@ -33,9 +24,6 @@
             "Omnipay\\PaymentWall\\": "src/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
-    }
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
