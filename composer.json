@@ -1,5 +1,5 @@
 {
-    "name": "twostars/omnipay-paymentwall",
+    "name": "xepozz/omnipay-paymentwall",
     "type": "library",
     "description": "PaymentWall driver for the Omnipay payment processing library",
     "keywords": [
@@ -17,12 +17,6 @@
         {
             "name": "Del",
             "email": "del@incube8.sg"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/twostars/paymentwall-php"
         }
     ],
     "require": {
