@@ -1,6 +1,7 @@
 {
     "name": "unisender/omnipay-paymentwall",
     "type": "library",
+    "license": "MIT",
     "description": "PaymentWall driver for the Omnipay payment processing library",
     "keywords": [
         "PaymentWall",
