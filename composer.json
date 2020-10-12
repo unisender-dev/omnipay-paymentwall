@@ -13,12 +13,12 @@
     ],
     "require": {
         "php": ">=7.0",
-        "paymentwall/paymentwall-php": "dev-master",
+        "paymentwall/paymentwall-php": "^2",
         "omnipay/common": "^3"
     },
     "require-dev": {
         "omnipay/tests": "^3",
-        "omnipay/dummy": "dev-master"
+        "omnipay/dummy": "^3"
     },
     "autoload": {
         "psr-4": {
