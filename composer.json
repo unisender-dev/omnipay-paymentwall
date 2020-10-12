@@ -1,5 +1,5 @@
 {
-    "name": "xepozz/omnipay-paymentwall",
+    "name": "unisender/omnipay-paymentwall",
     "type": "library",
     "description": "PaymentWall driver for the Omnipay payment processing library",
     "keywords": [
